@@ -89,6 +89,8 @@ class Job
     const PRIORITY_DEFAULT = 0;
     const PRIORITY_HIGH = 5;
 
+    private const RUNTIME_LIMIT = 65535;
+
     /** @ORM\Id @ORM\GeneratedValue(strategy = "AUTO") @ORM\Column(type = "bigint", options = {"unsigned": true}) */
     private $id;
 
@@ -431,7 +433,7 @@ class Job
 
     public function setRuntime($time)
     {
-        $this->runtime = (integer) $time;
+        $this->runtime = min(self::RUNTIME_LIMIT, (integer) $time);
     }
 
     public function getMemoryUsage()

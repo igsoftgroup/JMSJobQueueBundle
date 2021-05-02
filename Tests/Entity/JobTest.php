@@ -245,6 +245,14 @@ class JobTest extends TestCase
         $this->assertEquals('foo', $clonedJob->getQueue());
     }
 
+    public function testRuntimeLimit()
+    {
+        $job = new Job('a');
+        $job->setRuntime(65536);
+
+        $this->assertEquals(65535, $job->getRuntime());
+    }
+
     private function setField($obj, $field, $value)
     {
         $ref = new \ReflectionProperty($obj, $field);
