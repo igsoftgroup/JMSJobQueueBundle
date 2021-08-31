@@ -15,7 +15,7 @@
         "php": "^7.1",
         "symfony/framework-bundle": "^3.4 || ^4.0",
         "symfony/debug": "^3.4 || ^4.0",
-        "doctrine/common": "^2.3",
+        "doctrine/orm": "*",
         "symfony/process": "^3.4 || ^4.0"
     },
     "require-dev": {
@@ -27,7 +27,6 @@
         "symfony/finder": "*",
         "symfony/css-selector": "*",
         "doctrine/doctrine-bundle": "*",
-        "doctrine/orm": "*",
         "symfony/twig-bundle": "*",
         "symfony/form": "*",
         "symfony/validator": "*",
