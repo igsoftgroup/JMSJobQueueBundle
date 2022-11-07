@@ -22,6 +22,8 @@ use Symfony\Component\HttpKernel\KernelInterface;
  */
 class Application extends BaseApplication
 {
+    public const MAX_UNSIGNED_INT = 4294967295;
+
     private $insertStatStmt;
     private $input;
 
@@ -88,8 +90,8 @@ class Application extends BaseApplication
             "UPDATE jms_jobs SET stackTrace = :trace, memoryUsage = :memoryUsage, memoryUsageReal = :memoryUsageReal WHERE id = :id",
             array(
                 'id' => $jobId,
-                'memoryUsage' => memory_get_peak_usage(),
-                'memoryUsageReal' => memory_get_peak_usage(true),
+                'memoryUsage' => min(memory_get_peak_usage(), self::MAX_UNSIGNED_INT),
+                'memoryUsageReal' => min(memory_get_peak_usage(true), self::MAX_UNSIGNED_INT),
                 'trace' => serialize($ex ? FlattenException::create($ex) : null),
             ),
             array(
