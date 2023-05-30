@@ -22,6 +22,6 @@ class SafeObjectType extends ObjectType
      */
     public function requiresSQLCommentHint(AbstractPlatform $platform)
     {
-        return false;
+        return true;
     }
 }
