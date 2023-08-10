@@ -12,11 +12,11 @@
         }
     ],
     "require": {
-        "php": "^7.1",
-        "symfony/framework-bundle": "^3.4 || ^4.0 || ^5.0",
-        "symfony/debug": "^3.4 || ^4.0 || ^5.0",
+        "php": ">=8.2 || ^7.4",
+        "symfony/framework-bundle": "^5.4",
+        "symfony/debug": "^4.4",
         "doctrine/orm": "*",
-        "symfony/process": "^3.4 || ^4.0 || ^5.0"
+        "symfony/process": "^5.4"
     },
     "require-dev": {
         "doctrine/doctrine-fixtures-bundle": "*",
@@ -30,7 +30,7 @@
         "symfony/twig-bundle": "*",
         "symfony/form": "*",
         "symfony/validator": "*",
-        "phpunit/phpunit": "^6.0",
+        "phpunit/phpunit": "*",
         "symfony/intl": "*"
     },
     "suggest": {
