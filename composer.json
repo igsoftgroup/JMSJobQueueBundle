@@ -12,16 +12,15 @@
         }
     ],
     "require": {
-        "php": ">=8.2 || ^7.4",
-        "symfony/framework-bundle": "^5.4",
-        "symfony/debug": "^4.4",
+        "php": ">=8.2",
+        "symfony/framework-bundle": "^5.4 || ^6.4",
+        "symfony/error-handler": "^5.4 || ^6.4",
         "doctrine/orm": "*",
-        "symfony/process": "^5.4"
+        "symfony/process": "^5.4 || ^6.4",
+        "doctrine/common": "^3.4"
     },
     "require-dev": {
         "doctrine/doctrine-fixtures-bundle": "*",
-        "sensio/framework-extra-bundle": "*",
-        "symfony/class-loader": "*",
         "symfony/yaml": "*",
         "symfony/browser-kit": "*",
         "symfony/finder": "*",
@@ -34,7 +33,6 @@
         "symfony/intl": "*"
     },
     "suggest": {
-        "sensio/framework-extra-bundle": "Required when using the webinterface.",
         "symfony/twig-bundle": "Required when using the webinterface."
     },
     "autoload": {
