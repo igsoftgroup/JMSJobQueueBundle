@@ -25,7 +25,6 @@ use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Query\Parameter;
 use Doctrine\ORM\Query\ResultSetMappingBuilder;
-use Doctrine\Persistence\ObjectManager;
 use JMS\JobQueueBundle\Entity\Job;
 use JMS\JobQueueBundle\Event\StateChangeEvent;
 use JMS\JobQueueBundle\Retry\ExponentialRetryScheduler;
@@ -426,8 +425,12 @@ class JobManager
         return count($result);
     }
     
-    private function getJobManager(): ObjectManager
+    private function getJobManager(): EntityManager
     {
-        return $this->registry->getManagerForClass(Job::class);
+        $manager = $this->registry->getManagerForClass(Job::class);
+        if (!$manager instanceof EntityManager) {
+            throw new \LogicException('Manager is not an instance of EntityManager.');
+        }
+        return $manager;
     }
 }
