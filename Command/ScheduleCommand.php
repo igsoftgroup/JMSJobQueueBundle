@@ -120,7 +120,7 @@ class ScheduleCommand extends Command
         $con = $em->getConnection();
 
         $now = new \DateTime();
-        $affectedRows = $con->executeUpdate(
+        $affectedRows = $con->executeStatement(
             "UPDATE jms_cron_jobs SET lastRunAt = :now WHERE command = :command AND lastRunAt = :lastRunAt",
             array(
                 'now' => $now,
