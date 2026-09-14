@@ -25,15 +25,13 @@ use JMS\JobQueueBundle\Exception\LogicException;
 use Symfony\Component\ErrorHandler\Exception\FlattenException;
 
 /**
- * @ORM\Entity
- * @ORM\Table(name = "jms_jobs", indexes = {
- *     @ORM\Index("cmd_search_index", columns = {"command"}),
- *     @ORM\Index("sorting_index", columns = {"state", "priority", "id"}),
- * })
- * @ORM\ChangeTrackingPolicy("DEFERRED_EXPLICIT")
- *
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
  */
+#[ORM\Table(name: 'jms_jobs')]
+#[ORM\Index(name: 'cmd_search_index', columns: ['command'])]
+#[ORM\Index(name: 'sorting_index', columns: ['state', 'priority', 'id'])]
+#[ORM\Entity]
+#[ORM\ChangeTrackingPolicy('DEFERRED_EXPLICIT')]
 class Job
 {
     /** State if job is inserted, but not yet ready to be started. */
@@ -91,85 +89,82 @@ class Job
 
     private const RUNTIME_LIMIT = 65535;
 
-    /** @ORM\Id @ORM\GeneratedValue(strategy = "AUTO") @ORM\Column(type = "bigint", options = {"unsigned": true}) */
+    #[ORM\Id]
+    #[ORM\GeneratedValue(strategy: 'AUTO')]
+    #[ORM\Column(type: 'bigint', options: ['unsigned' => true])]
     private $id;
 
-    /** @ORM\Column(type = "string", length = 15) */
+    #[ORM\Column(type: 'string', length: 15)]
     private $state;
 
-    /** @ORM\Column(type = "string", length = Job::MAX_QUEUE_LENGTH) */
+    #[ORM\Column(type: 'string', length: Job::MAX_QUEUE_LENGTH)]
     private $queue;
 
-    /** @ORM\Column(type = "smallint") */
+    #[ORM\Column(type: 'smallint')]
     private $priority = 0;
 
-    /** @ORM\Column(type = "datetime", name="createdAt") */
+    #[ORM\Column(type: 'datetime', name: 'createdAt')]
     private $createdAt;
 
-    /** @ORM\Column(type = "datetime", name="startedAt", nullable = true) */
+    #[ORM\Column(type: 'datetime', name: 'startedAt', nullable: true)]
     private $startedAt;
 
-    /** @ORM\Column(type = "datetime", name="checkedAt", nullable = true) */
+    #[ORM\Column(type: 'datetime', name: 'checkedAt', nullable: true)]
     private $checkedAt;
 
-    /** @ORM\Column(type = "string", name="workerName", length = 50, nullable = true) */
+    #[ORM\Column(type: 'string', name: 'workerName', length: 50, nullable: true)]
     private $workerName;
 
-    /** @ORM\Column(type = "datetime", name="executeAfter", nullable = true) */
+    #[ORM\Column(type: 'datetime', name: 'executeAfter', nullable: true)]
     private $executeAfter;
 
-    /** @ORM\Column(type = "datetime", name="closedAt", nullable = true) */
+    #[ORM\Column(type: 'datetime', name: 'closedAt', nullable: true)]
     private $closedAt;
 
-    /** @ORM\Column(type = "string") */
+    #[ORM\Column(type: 'string')]
     private $command;
 
-    /** @ORM\Column(type = "json") */
+    #[ORM\Column(type: 'json')]
     private $args;
 
-    /**
-     * @ORM\ManyToMany(targetEntity = "Job", fetch = "EAGER")
-     * @ORM\JoinTable(name="jms_job_dependencies",
-     *     joinColumns = { @ORM\JoinColumn(name = "source_job_id", referencedColumnName = "id") },
-     *     inverseJoinColumns = { @ORM\JoinColumn(name = "dest_job_id", referencedColumnName = "id")}
-     * )
-     */
+    #[ORM\JoinTable(name: 'jms_job_dependencies')]
+    #[ORM\JoinColumn(name: 'source_job_id', referencedColumnName: 'id')]
+    #[ORM\InverseJoinColumn(name: 'dest_job_id', referencedColumnName: 'id')]
+    #[ORM\ManyToMany(targetEntity: Job::class, fetch: 'EAGER')]
     private $dependencies;
 
-    /** @ORM\Column(type = "text", nullable = true) */
+    #[ORM\Column(type: 'text', nullable: true)]
     private $output;
 
-    /** @ORM\Column(type = "text", name="errorOutput", nullable = true) */
+    #[ORM\Column(type: 'text', name: 'errorOutput', nullable: true)]
     private $errorOutput;
 
-    /** @ORM\Column(type = "smallint", name="exitCode", nullable = true, options = {"unsigned": true}) */
+    #[ORM\Column(type: 'smallint', name: 'exitCode', nullable: true, options: ['unsigned' => true])]
     private $exitCode;
 
-    /** @ORM\Column(type = "smallint", name="maxRuntime", options = {"unsigned": true}) */
+    #[ORM\Column(type: 'smallint', name: 'maxRuntime', options: ['unsigned' => true])]
     private $maxRuntime = 0;
 
-    /** @ORM\Column(type = "smallint", name="maxRetries", options = {"unsigned": true}) */
+    #[ORM\Column(type: 'smallint', name: 'maxRetries', options: ['unsigned' => true])]
     private $maxRetries = 0;
 
-    /**
-     * @ORM\ManyToOne(targetEntity = "Job", inversedBy = "retryJobs")
-     * @ORM\JoinColumn(name="originalJob_id", referencedColumnName="id")
-     */
+    #[ORM\JoinColumn(name: 'originalJob_id', referencedColumnName: 'id')]
+    #[ORM\ManyToOne(targetEntity: Job::class, inversedBy: 'retryJobs')]
     private $originalJob;
 
-    /** @ORM\OneToMany(targetEntity = "Job", mappedBy = "originalJob", cascade = {"persist", "remove", "detach", "refresh"}) */
+    #[ORM\OneToMany(targetEntity: Job::class, mappedBy: 'originalJob', cascade: ['persist', 'remove', 'detach', 'refresh'])]
     private $retryJobs;
 
-    /** @ORM\Column(type = "jms_job_safe_object", name="stackTrace", nullable = true) */
+    #[ORM\Column(type: 'jms_job_safe_object', name: 'stackTrace', nullable: true)]
     private $stackTrace;
 
-    /** @ORM\Column(type = "smallint", nullable = true, options = {"unsigned": true}) */
+    #[ORM\Column(type: 'smallint', nullable: true, options: ['unsigned' => true])]
     private $runtime;
 
-    /** @ORM\Column(type = "integer", name="memoryUsage", nullable = true, options = {"unsigned": true}) */
+    #[ORM\Column(type: 'integer', name: 'memoryUsage', nullable: true, options: ['unsigned' => true])]
     private $memoryUsage;
 
-    /** @ORM\Column(type = "integer", name="memoryUsageReal", nullable = true, options = {"unsigned": true}) */
+    #[ORM\Column(type: 'integer', name: 'memoryUsageReal', nullable: true, options: ['unsigned' => true])]
     private $memoryUsageReal;
 
     /**
