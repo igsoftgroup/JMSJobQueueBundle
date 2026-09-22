@@ -13,10 +13,10 @@
     ],
     "require": {
         "php": ">=8.2",
-        "symfony/framework-bundle": "^5.4 || ^6.4",
-        "symfony/error-handler": "^5.4 || ^6.4",
+        "symfony/framework-bundle": "^6.4 || ^7.0",
+        "symfony/error-handler": "^6.4 || ^7.0",
         "doctrine/orm": "*",
-        "symfony/process": "^5.4 || ^6.4",
+        "symfony/process": "^6.4 || ^7.0",
         "doctrine/common": "^3.4",
         "doctrine/dbal": "^3.0"
     },
