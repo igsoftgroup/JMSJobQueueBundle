@@ -20,8 +20,8 @@ namespace JMS\JobQueueBundle\Entity\Repository;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Util\ClassUtils;
-use Doctrine\DBAL\Connection;
-use Doctrine\DBAL\Types\Type;
+use Doctrine\DBAL\ArrayParameterType;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Query\Parameter;
 use Doctrine\ORM\Query\ResultSetMappingBuilder;
@@ -49,7 +49,7 @@ class JobManager
     {
         return $this->getJobManager()->createQuery("SELECT j FROM ".Job::class." j WHERE j.command = :command AND j.args = :args")
             ->setParameter('command', $command)
-            ->setParameter('args', $args, Type::JSON_ARRAY)
+            ->setParameter('args', $args, Types::JSON)
             ->setMaxResults(1)
             ->getOneOrNullResult();
     }
@@ -75,7 +75,7 @@ class JobManager
 
         $firstJob = $this->getJobManager()->createQuery("SELECT j FROM ".Job::class." j WHERE j.command = :command AND j.args = :args ORDER BY j.id ASC")
              ->setParameter('command', $command)
-             ->setParameter('args', $args, 'json_array')
+             ->setParameter('args', $args, Types::JSON)
              ->setMaxResults(1)
              ->getSingleResult();
 
@@ -113,7 +113,7 @@ class JobManager
 
     private function acquireLock($workerName, Job $job)
     {
-        $affectedRows = $this->getJobManager()->getConnection()->executeUpdate(
+        $affectedRows = $this->getJobManager()->getConnection()->executeStatement(
             "UPDATE jms_jobs SET workerName = :worker WHERE id = :id AND workerName IS NULL",
             array(
                 'worker' => $workerName,
@@ -163,7 +163,7 @@ class JobManager
 
         if ( ! empty($states)) {
             $sql .= " AND j.state IN (:states)";
-            $params->add(new Parameter('states', $states, Connection::PARAM_STR_ARRAY));
+            $params->add(new Parameter('states', $states, ArrayParameterType::STRING));
         }
 
         return $this->getJobManager()->createNativeQuery($sql, $rsm)
@@ -177,7 +177,7 @@ class JobManager
             throw new \RuntimeException('$entity must be an object.');
         }
 
-        if ($entity instanceof \Doctrine\Common\Persistence\Proxy) {
+        if ($entity instanceof \Doctrine\Persistence\Proxy) {
             $entity->__load();
         }
 
@@ -212,17 +212,17 @@ class JobManager
 
         if ( ! empty($excludedIds)) {
             $conditions[] = $qb->expr()->notIn('j.id', ':excludedIds');
-            $qb->setParameter('excludedIds', $excludedIds, Connection::PARAM_INT_ARRAY);
+            $qb->setParameter('excludedIds', $excludedIds, ArrayParameterType::INTEGER);
         }
 
         if ( ! empty($excludedQueues)) {
             $conditions[] = $qb->expr()->notIn('j.queue', ':excludedQueues');
-            $qb->setParameter('excludedQueues', $excludedQueues, Connection::PARAM_STR_ARRAY);
+            $qb->setParameter('excludedQueues', $excludedQueues, ArrayParameterType::STRING);
         }
 
         if ( ! empty($restrictedQueues)) {
             $conditions[] = $qb->expr()->in('j.queue', ':restrictedQueues');
-            $qb->setParameter('restrictedQueues', $restrictedQueues, Connection::PARAM_STR_ARRAY);
+            $qb->setParameter('restrictedQueues', $restrictedQueues, ArrayParameterType::STRING);
         }
 
         $qb->where(call_user_func_array(array($qb->expr(), 'andX'), $conditions));
@@ -384,7 +384,7 @@ class JobManager
     {
         $jobIds = $this->getJobManager()->getConnection()
             ->executeQuery("SELECT source_job_id FROM jms_job_dependencies WHERE dest_job_id = :id", array('id' => $job->getId()))
-            ->fetchAll(\PDO::FETCH_COLUMN);
+            ->fetchFirstColumn();
 
         return $jobIds;
     }
@@ -427,6 +427,10 @@ class JobManager
     
     private function getJobManager(): EntityManager
     {
-        return $this->registry->getManagerForClass(Job::class);
+        $manager = $this->registry->getManagerForClass(Job::class);
+        if (!$manager instanceof EntityManager) {
+            throw new \LogicException('Manager is not an instance of EntityManager.');
+        }
+        return $manager;
     }
 }
